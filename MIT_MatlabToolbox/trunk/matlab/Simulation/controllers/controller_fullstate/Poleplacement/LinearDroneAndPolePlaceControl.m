@@ -16,8 +16,8 @@ mdl_quadrotor
 %% 1.1) Simplified Dynamics
 
 %symbolic variables
-syms Pxw Pyw Pzw yaw pitch roll dpx dpy dpz p q r T tauy taup taur;
-symsvector  = [Pxw; Pyw; Pzw ;yaw ;pitch ;roll ;dpx ;dpy ;dpz ;p ;q ;r ;T ;tauy ;taup ;taur];
+syms Pxw Pyw Pzw yaw pitch roll dpx dpy dpz p q r T1 T2 T3 T4 T tauy taup taur;
+symsvector  = [Pxw; Pyw; Pzw ;yaw ;pitch ;roll ;dpx ;dpy ;dpz ;p ;q ;r ;T1; T2; T3; T4];%T ;tauy ;taup ;taur];
 
 %Inertia
 J            = quad.J;
@@ -53,25 +53,37 @@ iW = ...
 %%Linearization Point = Hover
 %-----------
 state_equil = [0; 0; -1.5; 0 ;0 ;0 ;0 ;0 ;0 ;0 ;0 ;0 ]; %x_eq
-input_equil = [-quad.g*quad.M ;0 ;0 ;0];                %u_eq
+input_equil = controlHelperParams.Q2Ts*[-quad.g*quad.M ;0 ;0 ;0];                %u_eq
 equil       = [state_equil; input_equil];
 
+% u_p to u_m
+u_p = controlHelperParams.Ts2Q*[T1; T2; T3; T4];
+T = u_p(1);
+taur = u_p(2);
+taup = u_p(3);
+tauy = u_p(4);
+
 %%Dynamics
-%----------      
+%----------   
+% Position
 %P dot      
 P_dot           = simplify(Body2Global*[dpx;dpy;dpz]);
 P_dot_jacobian  = jacobian(P_dot,symsvector);
 P_dot_jacobian_eql = subs(P_dot_jacobian,symsvector,equil);
 
+% Euler angles
 %O dot      
 O_dot           = iW*[p;q;r];
 O_dot_jacobian  = jacobian(O_dot,symsvector);
 O_dot_jacobian_eql = subs(O_dot_jacobian,symsvector,equil);
 
+% linear velocity
 %p ddot      
 p_ddot          = Global2Body*[0;0;quad.g] + T/quad.M*[0;0;1] -cross(transpose([p,q,r]),transpose([dpx,dpy,dpz]));
 p_ddot_jacobian = jacobian(p_ddot,symsvector);
 p_ddot_jacobian_eql = subs(p_ddot_jacobian,symsvector,equil);
+
+% angular velocity
 %o ddot      
 o_ddot          = inv(J)*([taur; taup; tauy] - cross([p;q;r],J*[p;q;r]));
 o_ddot_jacobian = jacobian(o_ddot,symsvector);
@@ -83,6 +95,8 @@ o_ddot_jacobian_eql = subs(o_ddot_jacobian,symsvector,equil);
 matrixAB = [P_dot_jacobian_eql;O_dot_jacobian_eql;p_ddot_jacobian_eql;o_ddot_jacobian_eql];
 A = double(matrixAB(1:12,1:12))
 B = double(matrixAB(1:12,13:16))
+A_LA = linsys1.A
+B_LA = linsys1.B
 %Note x_nonlinearSys = x_eq + x_linearizedSys! Thus, x0_linearizedSys = x0_nonlinear - x_eq; 
 %Note u_nonlinearSys = u_eq + x_linearizedSys!
 
@@ -105,18 +119,19 @@ Veig_nrm = diag(1./sum(V,1))*V; % decoupled system will have a new state-vector 
 A_dec   = inv(Veig_nrm)*A*Veig_nrm;
 B_dec   = inv(Veig_nrm)*B;
 
+
 % Define decoupled subsystems
-A_dec_x   = ...
-B_dec_x   = ...
+A_dec_x   = A_dec(:,1:4);
+B_dec_x   = B_dec(1:4,:);
 
-A_dec_z   = ...
-B_dec_z   = ...
+A_dec_z   = A_dec(:,9:10);
+B_dec_z   = B_dec(9:10,:);
 
-A_dec_y   = ...
-B_dec_y   = ...
+A_dec_y   = A_dec(:,5:8);
+B_dec_y   = B_dec(5:8,:);
 
-A_dec_yaw = ...
-B_dec_yaw = ...
+A_dec_yaw = A_dec(:,11:12);
+B_dec_yaw = B_dec(11:12,:);
 
 % Now place your own poles for the decoupled subsystems separately
 
@@ -126,10 +141,10 @@ yawpoles    = [-3;-3.1];
 zpoles      = [-2;-2.1];               % Play around with poles here: Slow poles [-2;-2.1], Fast poles [-5;-5.1];
 %zpoles     = [-5;-5.1];               % Play around with poles here: Slow poles [-2;-2.1], Fast poles [-5;-5.1];
 
-K_dec_x     = ...
-K_dec_z     = ...
-K_dec_y     = ...    
-K_dec_yaw   = ...
+K_dec_x     =  place(A_dec_x,B_dec_x,xpoles);
+K_dec_y     =  place(A_dec_y,B_dec_y,ypoles); 
+K_dec_z     =  place(A_dec_z,B_dec_z,zpoles); 
+K_dec_yaw   = place(A_dec_yaw,B_dec_yaw,yawpoles); 
 
 % Compute Full-state feedback for 'original' system
 K_poleplace = [K_dec_x K_dec_z K_dec_y K_dec_yaw]*inv(Veig_nrm);

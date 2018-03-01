@@ -1,0 +1,379 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>LinearDroneAndPolePlaceControl</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-02-28"><meta name="DC.source" content="LinearDroneAndPolePlaceControl.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Linearization of drone dynamics about hover &amp; full-state feedback design</a></li><li><a href="#2">1.1) Simplified Dynamics</a></li><li><a href="#3">1.2) Linearizing Full Nonlinear Simulink Model (the model from Robotics Toolbox)</a></li><li><a href="#4">2.1) Designing Full-state Feedback Controllers with Simplified Dynamics Model (1.1) via Pole Placement</a></li></ul></div><h2 id="1">Linearization of drone dynamics about hover &amp; full-state feedback design</h2><p>=============================== AUTHOR Fabian Riether CREATE DATE 2015/08/25 PURPOSE This code assists in linearizing drone dynamics and designing full-state feedback controls SPECIAL NOTES ===============================  2015/08/25 created ==================================</p><pre class="codeinput"><span class="comment">%Load drone parameters from RoboticsToolbox</span>
+mdl_quadrotor
+</pre><h2 id="2">1.1) Simplified Dynamics</h2><pre class="codeinput"><span class="comment">%symbolic variables</span>
+syms <span class="string">Pxw</span> <span class="string">Pyw</span> <span class="string">Pzw</span> <span class="string">yaw</span> <span class="string">pitch</span> <span class="string">roll</span> <span class="string">dpx</span> <span class="string">dpy</span> <span class="string">dpz</span> <span class="string">p</span> <span class="string">q</span> <span class="string">r</span> <span class="string">T</span> <span class="string">tauy</span> <span class="string">taup</span> <span class="string">taur</span>;
+symsvector  = [Pxw; Pyw; Pzw ;yaw ;pitch ;roll ;dpx ;dpy ;dpz ;p ;q ;r ;T ;tauy ;taup ;taur];
+
+<span class="comment">%Inertia</span>
+J            = quad.J;
+
+<span class="comment">%Define Rotation matrices</span>
+Ryaw = [
+	[ cos(yaw), -sin(yaw), 0],
+	[ sin(yaw),  cos(yaw), 0],
+	[        0,         0, 1]
+];
+
+Rpitch = [
+	[  cos(pitch), 0, sin(pitch)],
+	[           0, 1,          0],
+	[ -sin(pitch), 0, cos(pitch)]
+];
+
+Rroll = [
+	[ 1,         0,          0],
+	[ 0, cos(roll), -sin(roll)],
+	[ 0, sin(roll),  cos(roll)]
+];
+
+Body2Global = Ryaw*Rpitch*Rroll;
+Global2Body = simplify(Body2Global^-1);
+
+<span class="comment">%Transformation from body rates p-q-r to euler rates yaw pitch roll</span>
+iW = <span class="keyword">...</span>
+    [0        sin(roll)          cos(roll);
+     0        cos(roll)*cos(pitch) -sin(roll)*cos(pitch);
+     cos(pitch) sin(roll)*sin(pitch) cos(roll)*sin(pitch)] / cos(pitch);
+
+<span class="comment">%%Linearization Point = Hover</span>
+<span class="comment">%-----------</span>
+state_equil = [0; 0; -1.5; 0 ;0 ;0 ;0 ;0 ;0 ;0 ;0 ;0 ]; <span class="comment">%x_eq</span>
+input_equil = controlHelperParams.Q2Ts*[-quad.g*quad.M ;0 ;0 ;0];                <span class="comment">%u_eq</span>
+equil       = [state_equil; input_equil];
+
+<span class="comment">%%Dynamics</span>
+<span class="comment">%----------</span>
+<span class="comment">%P dot</span>
+P_dot           = simplify(Body2Global*[dpx;dpy;dpz]);
+P_dot_jacobian  = jacobian(P_dot,symsvector);
+P_dot_jacobian_eql = subs(P_dot_jacobian,symsvector,equil);
+
+<span class="comment">%O dot</span>
+O_dot           = iW*[p;q;r];
+O_dot_jacobian  = jacobian(O_dot,symsvector);
+O_dot_jacobian_eql = subs(O_dot_jacobian,symsvector,equil);
+
+<span class="comment">%p ddot</span>
+p_ddot          = Global2Body*[0;0;quad.g] + T/quad.M*[0;0;1] -cross(transpose([p,q,r]),transpose([dpx,dpy,dpz]));
+p_ddot_jacobian = jacobian(p_ddot,symsvector);
+p_ddot_jacobian_eql = subs(p_ddot_jacobian,symsvector,equil);
+<span class="comment">%o ddot</span>
+o_ddot          = inv(J)*([taur; taup; tauy] - cross([p;q;r],J*[p;q;r]));
+o_ddot_jacobian = jacobian(o_ddot,symsvector);
+o_ddot_jacobian_eql = subs(o_ddot_jacobian,symsvector,equil);
+
+<span class="comment">%Dynamics matrix</span>
+<span class="comment">%----------</span>
+
+matrixAB = [P_dot_jacobian_eql;O_dot_jacobian_eql;p_ddot_jacobian_eql;o_ddot_jacobian_eql];
+A = double(matrixAB(1:12,1:12))
+B = double(matrixAB(1:12,13:16))
+<span class="comment">%Note x_nonlinearSys = x_eq + x_linearizedSys! Thus, x0_linearizedSys = x0_nonlinear - x_eq;</span>
+<span class="comment">%Note u_nonlinearSys = u_eq + x_linearizedSys!</span>
+</pre><pre class="codeoutput">
+A =
+
+  Columns 1 through 7
+
+         0         0         0         0         0         0    1.0000
+         0         0         0         0         0         0         0
+         0         0         0         0         0         0         0
+         0         0         0         0         0         0         0
+         0         0         0         0         0         0         0
+         0         0         0         0         0         0         0
+         0         0         0         0   -9.8100         0         0
+         0         0         0         0         0    9.8100         0
+         0         0         0         0         0         0         0
+         0         0         0         0         0         0         0
+         0         0         0         0         0         0         0
+         0         0         0         0         0         0         0
+
+  Columns 8 through 12
+
+         0         0         0         0         0
+    1.0000         0         0         0         0
+         0    1.0000         0         0         0
+         0         0         0         0    1.0000
+         0         0         0    1.0000         0
+         0         0    1.0000         0         0
+         0         0         0         0         0
+         0         0         0         0         0
+         0         0         0         0         0
+         0         0         0         0         0
+         0         0         0         0         0
+         0         0         0         0         0
+
+
+B =
+
+   1.0e+04 *
+
+         0         0         0         0
+         0         0         0         0
+         0         0         0         0
+         0         0         0         0
+         0         0         0         0
+         0         0         0         0
+         0         0         0         0
+         0         0         0         0
+    0.0015         0         0         0
+         0         0         0    1.4577
+         0         0    1.0870         0
+         0    0.7321         0         0
+
+</pre><h2 id="3">1.2) Linearizing Full Nonlinear Simulink Model (the model from Robotics Toolbox)</h2><pre class="codeinput"><span class="comment">%use Simulation/controllers/controller_fullstate/Poleplacement/linearizeDrone(...).slx and Simulink's ControlDesign/Linear Analysis</span>
+</pre><h2 id="4">2.1) Designing Full-state Feedback Controllers with Simplified Dynamics Model (1.1) via Pole Placement</h2><pre class="codeinput"> <span class="comment">%Note: We linearized about hover. This also implies: The control "policy"</span>
+ <span class="comment">%to correct a position error was derived under a yaw-angle of zero!</span>
+ <span class="comment">%If your drone yaw-drifts 90 deg and runs into a world-X-error, it will</span>
+ <span class="comment">%still believe that pitch is the right answer to correct for this position error! You can compensate for this by</span>
+ <span class="comment">%rotation the X-Y-error by the current yaw angle.</span>
+
+<span class="comment">% Find states to decouple</span>
+[V,J]   = jordan(A);
+Veig_nrm = diag(1./sum(V,1))*V; <span class="comment">% decoupled system will have a new state-vector x_dec = inv(Veig_nrm)*x</span>
+
+<span class="comment">% System matrices of decoupled system</span>
+A_dec   = inv(Veig_nrm)*A*Veig_nrm;
+B_dec   = inv(Veig_nrm)*B;
+<span class="comment">%{
+</span><span class="comment">% Define decoupled subsystems
+</span><span class="comment">A_dec_x   = ...
+</span><span class="comment">B_dec_x   = ...
+</span><span class="comment">
+</span><span class="comment">A_dec_z   = ...
+</span><span class="comment">B_dec_z   = ...
+</span><span class="comment">
+</span><span class="comment">A_dec_y   = ...
+</span><span class="comment">B_dec_y   = ...
+</span><span class="comment">
+</span><span class="comment">A_dec_yaw = ...
+</span><span class="comment">B_dec_yaw = ...
+</span><span class="comment">
+</span><span class="comment">% Now place your own poles for the decoupled subsystems separately
+</span><span class="comment">
+</span><span class="comment">xpoles      = [-9+6i;-9-6i;-0.18+1.8i;-0.18-1.8i];
+</span><span class="comment">ypoles      = [-60;-4;-0.16+2i;-0.16-2i];
+</span><span class="comment">yawpoles    = [-3;-3.1];
+</span><span class="comment">zpoles      = [-2;-2.1];               % Play around with poles here: Slow poles [-2;-2.1], Fast poles [-5;-5.1];
+</span><span class="comment">%zpoles     = [-5;-5.1];               % Play around with poles here: Slow poles [-2;-2.1], Fast poles [-5;-5.1];
+</span><span class="comment">
+</span><span class="comment">K_dec_x     = ...
+</span><span class="comment">K_dec_z     = ...
+</span><span class="comment">K_dec_y     = ...
+</span><span class="comment">K_dec_yaw   = ...
+</span><span class="comment">
+</span><span class="comment">% Compute Full-state feedback for 'original' system
+</span><span class="comment">K_poleplace = [K_dec_x K_dec_z K_dec_y K_dec_yaw]*inv(Veig_nrm);
+</span><span class="comment">K_poleplace(abs(K_poleplace)&lt;1e-7)=0;
+</span><span class="comment">%}</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Linearization of drone dynamics about hover & full-state feedback design
+% ===============================
+% AUTHOR Fabian Riether
+% CREATE DATE 2015/08/25
+% PURPOSE This code assists in linearizing drone dynamics and designing
+% full-state feedback controls
+% SPECIAL NOTES
+% ===============================
+%  2015/08/25 created
+% ==================================
+
+%Load drone parameters from RoboticsToolbox
+mdl_quadrotor
+
+
+%% 1.1) Simplified Dynamics
+
+%symbolic variables
+syms Pxw Pyw Pzw yaw pitch roll dpx dpy dpz p q r T tauy taup taur;
+symsvector  = [Pxw; Pyw; Pzw ;yaw ;pitch ;roll ;dpx ;dpy ;dpz ;p ;q ;r ;T ;tauy ;taup ;taur];
+
+%Inertia
+J            = quad.J;
+
+%Define Rotation matrices
+Ryaw = [
+	[ cos(yaw), -sin(yaw), 0],
+	[ sin(yaw),  cos(yaw), 0],
+	[        0,         0, 1]
+];
+
+Rpitch = [
+	[  cos(pitch), 0, sin(pitch)],
+	[           0, 1,          0],
+	[ -sin(pitch), 0, cos(pitch)]
+];
+
+Rroll = [
+	[ 1,         0,          0],
+	[ 0, cos(roll), -sin(roll)],
+	[ 0, sin(roll),  cos(roll)]
+];
+
+Body2Global = Ryaw*Rpitch*Rroll;
+Global2Body = simplify(Body2Global^-1);
+
+%Transformation from body rates p-q-r to euler rates yaw pitch roll
+iW = ...
+    [0        sin(roll)          cos(roll);             
+     0        cos(roll)*cos(pitch) -sin(roll)*cos(pitch);
+     cos(pitch) sin(roll)*sin(pitch) cos(roll)*sin(pitch)] / cos(pitch);
+
+%%Linearization Point = Hover
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+state_equil = [0; 0; -1.5; 0 ;0 ;0 ;0 ;0 ;0 ;0 ;0 ;0 ]; %x_eq
+input_equil = controlHelperParams.Q2Ts*[-quad.g*quad.M ;0 ;0 ;0];                %u_eq
+equil       = [state_equil; input_equil];
+
+%%Dynamics
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH      
+%P dot      
+P_dot           = simplify(Body2Global*[dpx;dpy;dpz]);
+P_dot_jacobian  = jacobian(P_dot,symsvector);
+P_dot_jacobian_eql = subs(P_dot_jacobian,symsvector,equil);
+
+%O dot      
+O_dot           = iW*[p;q;r];
+O_dot_jacobian  = jacobian(O_dot,symsvector);
+O_dot_jacobian_eql = subs(O_dot_jacobian,symsvector,equil);
+
+%p ddot      
+p_ddot          = Global2Body*[0;0;quad.g] + T/quad.M*[0;0;1] -cross(transpose([p,q,r]),transpose([dpx,dpy,dpz]));
+p_ddot_jacobian = jacobian(p_ddot,symsvector);
+p_ddot_jacobian_eql = subs(p_ddot_jacobian,symsvector,equil);
+%o ddot      
+o_ddot          = inv(J)*([taur; taup; tauy] - cross([p;q;r],J*[p;q;r]));
+o_ddot_jacobian = jacobian(o_ddot,symsvector);
+o_ddot_jacobian_eql = subs(o_ddot_jacobian,symsvector,equil);
+
+%Dynamics matrix
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH 
+
+matrixAB = [P_dot_jacobian_eql;O_dot_jacobian_eql;p_ddot_jacobian_eql;o_ddot_jacobian_eql];
+A = double(matrixAB(1:12,1:12))
+B = double(matrixAB(1:12,13:16))
+%Note x_nonlinearSys = x_eq + x_linearizedSys! Thus, x0_linearizedSys = x0_nonlinear - x_eq; 
+%Note u_nonlinearSys = u_eq + x_linearizedSys!
+
+%% 1.2) Linearizing Full Nonlinear Simulink Model (the model from Robotics Toolbox)
+%use Simulation/controllers/controller_fullstate/Poleplacement/linearizeDrone(...).slx and Simulink's ControlDesign/Linear Analysis
+
+%% 2.1) Designing Full-state Feedback Controllers with Simplified Dynamics Model (1.1) via Pole Placement
+
+ %Note: We linearized about hover. This also implies: The control "policy"
+ %to correct a position error was derived under a yaw-angle of zero!
+ %If your drone yaw-drifts 90 deg and runs into a world-X-error, it will
+ %still believe that pitch is the right answer to correct for this position error! You can compensate for this by
+ %rotation the X-Y-error by the current yaw angle.
+
+% Find states to decouple
+[V,J]   = jordan(A);
+Veig_nrm = diag(1./sum(V,1))*V; % decoupled system will have a new state-vector x_dec = inv(Veig_nrm)*x
+
+% System matrices of decoupled system
+A_dec   = inv(Veig_nrm)*A*Veig_nrm;
+B_dec   = inv(Veig_nrm)*B;
+%{
+% Define decoupled subsystems
+A_dec_x   = ...
+B_dec_x   = ...
+
+A_dec_z   = ...
+B_dec_z   = ...
+
+A_dec_y   = ...
+B_dec_y   = ...
+
+A_dec_yaw = ...
+B_dec_yaw = ...
+
+% Now place your own poles for the decoupled subsystems separately
+
+xpoles      = [-9+6i;-9-6i;-0.18+1.8i;-0.18-1.8i];
+ypoles      = [-60;-4;-0.16+2i;-0.16-2i];       
+yawpoles    = [-3;-3.1];
+zpoles      = [-2;-2.1];               % Play around with poles here: Slow poles [-2;-2.1], Fast poles [-5;-5.1];
+%zpoles     = [-5;-5.1];               % Play around with poles here: Slow poles [-2;-2.1], Fast poles [-5;-5.1];
+
+K_dec_x     = ...
+K_dec_z     = ...
+K_dec_y     = ...    
+K_dec_yaw   = ...
+
+% Compute Full-state feedback for 'original' system
+K_poleplace = [K_dec_x K_dec_z K_dec_y K_dec_yaw]*inv(Veig_nrm);
+K_poleplace(abs(K_poleplace)<1e-7)=0;
+%}
+
+
+##### SOURCE END #####
+--></body></html>
