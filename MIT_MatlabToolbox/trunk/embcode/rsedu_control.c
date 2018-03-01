@@ -27,10 +27,13 @@ int FEAT_NOSAFETY 	= 0;	//1: drone is not automatically shut down when take off-
 //(This setting is dangerous but allows for more acrobatic maneuvers)
 
 //Flight time takeoff, calibration: Nr of Cycles
-int onCycles 		= 4000; //note that code runs at 200Hz! So 4000-> 20sec
+int onCycles 		= 8000; //note that code runs at 200Hz! So 4000-> 20sec
 int calibCycles 	= 400;
 int takeoffCycles	= 200;
 
+int moveInterval = 2;
+int pauseInterval = 4;
+double tempTime = 0.0;
 
 //-------------------
 //SIMULINK compensator block "Parameter definitions"
@@ -1316,6 +1319,45 @@ void RSEDU_control(HAL_acquisition_t* hal_sensors_data, HAL_command_t* hal_senso
             else
                 //angle control
                 Drone_Compensator_U_controlModePosVSOrient_flagin = 0; //0 ; 1 position reference, 0 angle reference
+            if (counter > 1500){
+              tempTime = ((counter-1500)%(moveInterval*800))*.005;
+              printf("Time = %f\n",tempTime);
+            if((tempTime>0)&&(tempTime<moveInterval)){
+              Drone_Compensator_U_pos_refin[0] = 0;
+              Drone_Compensator_U_pos_refin[1] = tempTime/moveInterval/2; 
+            }
+            else if((tempTime>=moveInterval)&&(tempTime<moveInterval+pauseInterval)){
+              Drone_Compensator_U_pos_refin[0] = 0;
+              Drone_Compensator_U_pos_refin[1] = 0; 
+            }
+            else if((tempTime>=moveInterval+pauseInterval)&&(tempTime<moveInterval*2+pauseInterval)){
+              Drone_Compensator_U_pos_refin[0] = (tempTime-moveInterval+1)/moveInterval/2;
+              Drone_Compensator_U_pos_refin[1] = 0; 
+              /*Drone_Compensator_U_pos_refin[0] = 0;
+              Drone_Compensator_U_pos_refin[1] = -(tempTime-moveInterval+1)/moveInterval/2; */
+            }
+            else if((tempTime>=moveInterval*2+pauseInterval)&&(tempTime<moveInterval*2+2*pauseInterval)){
+              Drone_Compensator_U_pos_refin[0] = 0;
+              Drone_Compensator_U_pos_refin[1] = 0;
+            }
+            else if((tempTime>=moveInterval*2+2*pauseInterval)&&(tempTime<moveInterval*3+2*pauseInterval)){
+              Drone_Compensator_U_pos_refin[0] = 0;
+              Drone_Compensator_U_pos_refin[1] = -(tempTime-moveInterval*2+2)/moveInterval/2;
+              /*Drone_Compensator_U_pos_refin[0] = 0;
+              Drone_Compensator_U_pos_refin[1] = (tempTime-moveInterval*2+2)/moveInterval/2;*/
+            }
+            else if((tempTime>=moveInterval*3+2*pauseInterval)&&(tempTime<moveInterval*3+3*pauseInterval)){
+              Drone_Compensator_U_pos_refin[0] = 0;
+              Drone_Compensator_U_pos_refin[1] = 0;
+            }
+            else{
+              Drone_Compensator_U_pos_refin[0] = -(tempTime-moveInterval*3+3)/moveInterval/2;
+              Drone_Compensator_U_pos_refin[1] = 0; 
+              /*Drone_Compensator_U_pos_refin[0] = 0;
+              Drone_Compensator_U_pos_refin[1] = -(tempTime-moveInterval*3+3)/moveInterval/2; */
+            }
+            }
+            //printf("\n%f",tempTime);
 
 
             //use of position estimate from vision
