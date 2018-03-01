@@ -11,7 +11,7 @@
 % ==================================
 
 
-%load('/home/student/RollingSpiderEdu/MIT_MatlabToolbox/DroneExchange/RSdata_exampleflight.mat')
+load('/home/student/RollingSpiderEdu/MIT_MatlabToolbox/DroneExchange/RSdata_exa')
 
 %% Rearrange data
 %Load all parameters

@@ -51,11 +51,11 @@ static P_Drone_Compensator_T Drone_Compensator_P = {
     13840.8,
     1530.72683064892,
 
-    { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0165195073635001, 0.0152648883285633,
-      0.0215786550496705, 0.000652733165165932, 0.000721701528439517,
-      0.000690781425279554 },
-
-    { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.05, 0.05, 0.05, 1.0, 1.0, 1.0 },
+    { 0.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.002, 0.0,
+      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 50.0 },
     1.0,
 
     { 0.09, -0.06, -9.473, -0.0095, -0.0075, 0.0015, 101270.95 },
@@ -81,9 +81,9 @@ static P_Drone_Compensator_T Drone_Compensator_P = {
     0.1,
     5.5,
     2.5,
-    0.1,
+    0.2,
     3.0,
-    1.0,
+    1.5,
     0.0,
     3.0,
     1.0,
@@ -158,7 +158,7 @@ static P_Drone_Compensator_T Drone_Compensator_P = {
       1.0, -0.0024137419083240857, 0.044123463146040563, -0.044123463146040563 },
 
     { 0.25, 0.25, 0.25, 0.25, 103.57362530676717, -103.57362530676717,
-      103.57362530676717, -103.57362530676717, -5.6659197210460537,
+      103.57362530676717, -103.57362530676717, -5.6659197210460546,
       -5.6659197210460546, 5.6659197210460546, 5.6659197210460546,
       -5.6659197210460546, 5.6659197210460546, 5.6659197210460546,
       -5.6659197210460546 },
@@ -261,14 +261,14 @@ static P_Drone_Compensator_T Drone_Compensator_P = {
     /*  Expression: estimParams.IMU.filter_gyro_r_b
      * Referenced by: '<S10>/IIR_IMUgyro_r'
      */
-    { 0.28212412246252067, 1.272539291716861, 2.4208439774454473,
-      2.4208439774454487, 1.272539291716863, 0.28212412246252133 },
+    { 0.28212412246252078, 1.2725392917168599, 2.4208439774454433,
+      2.4208439774454429, 1.272539291716859, 0.28212412246252039 },
 
     /*  Expression: estimParams.IMU.filter_gyro_r_a
      * Referenced by: '<S10>/IIR_IMUgyro_r'
      */
     { 1.0, 2.2287149173647665, 2.5244618916938606, 1.5772531712757014,
-      0.541022406829817, 0.079562396085500781 },
+      0.54102240682981717, 0.079562396085500836 },
     0.0,                               /* Expression: 0
                                         * Referenced by: '<S10>/IIR_IMUgyro_r'
                                         */
@@ -279,19 +279,19 @@ static P_Drone_Compensator_T Drone_Compensator_P = {
     /*  Expression: pInitialization.M
      * Referenced by: '<S134>/KalmanGainM'
      */
-    { 0.005756860081440762, 0.0, 0.0, 0.005756860081440762 },
+    { 0.0057568600814408791, 0.0, 0.0, 0.0057568600814408791 },
 
     /*  Expression: estimParams.IMU.filter_gyro_r_b
      * Referenced by: '<S69>/IIRgyroz'
      */
-    { 0.28212412246252067, 1.272539291716861, 2.4208439774454473,
-      2.4208439774454487, 1.272539291716863, 0.28212412246252133 },
+    { 0.28212412246252078, 1.2725392917168599, 2.4208439774454433,
+      2.4208439774454429, 1.272539291716859, 0.28212412246252039 },
 
     /*  Expression: estimParams.IMU.filter_gyro_r_b
      * Referenced by: '<S69>/IIRgyroz'
      */
-    { 0.28212412246252067, 1.272539291716861, 2.4208439774454473,
-      2.4208439774454487, 1.272539291716863, 0.28212412246252133 },
+    { 0.28212412246252078, 1.2725392917168599, 2.4208439774454433,
+      2.4208439774454429, 1.272539291716859, 0.28212412246252039 },
     0.0,                               /* Expression: 0
                                         * Referenced by: '<S69>/IIRgyroz'
                                         */
@@ -317,8 +317,8 @@ static P_Drone_Compensator_T Drone_Compensator_P = {
     /*  Expression: estimParams.alt.filter_prs_b
      * Referenced by: '<S12>/pressureFilter_IIR'
      */
-    { 0.007509257528603033, -0.022498139897706472, 0.014988905760749172,
-      0.014988905760749172, -0.022498139897706455, 0.0075092575286030234 },
+    { 0.0075092575286030347, -0.022498139897706496, 0.014988905760749223,
+      0.014988905760749157, -0.022498139897706482, 0.0075092575286030382 },
 
     /*  Expression: estimParams.alt.filter_prs_a
      * Referenced by: '<S12>/pressureFilter_IIR'
@@ -332,8 +332,8 @@ static P_Drone_Compensator_T Drone_Compensator_P = {
     /*  Expression: estimParams.alt.filter_sonar_b
      * Referenced by: '<S12>/soonarFilter_IIR'
      */
-    { 0.007509257528603033, -0.022498139897706472, 0.014988905760749172,
-      0.014988905760749172, -0.022498139897706455, 0.0075092575286030234 },
+    { 0.0075092575286030347, -0.022498139897706496, 0.014988905760749223,
+      0.014988905760749157, -0.022498139897706482, 0.0075092575286030382 },
 
     /*  Expression: estimParams.alt.filter_sonar_a
      * Referenced by: '<S12>/soonarFilter_IIR'
@@ -347,7 +347,7 @@ static P_Drone_Compensator_T Drone_Compensator_P = {
     /*  Expression: pInitialization.M
      * Referenced by: '<S16>/KalmanGainM'
      */
-    { 0.026241420641871072, 0.069776736071495274 },
+    { 0.026241420641871412, 0.0697767360714959 },
 
     /*  Expression: [0 0 quad.g]
      * Referenced by: '<S7>/gravity'
@@ -370,7 +370,7 @@ static P_Drone_Compensator_T Drone_Compensator_P = {
     /*  Expression: pInitialization.M
      * Referenced by: '<S74>/KalmanGainM'
      */
-    { 0.1254656089860898, 0.0, 0.0, 0.1254656089860898 },
+    { 0.12546560898608936, 0.0, 0.0, 0.12546560898608936 },
 
     /*  Expression: [0 0 -quad.g]
      * Referenced by: '<S67>/gravity'
@@ -441,7 +441,7 @@ static P_Drone_Compensator_T Drone_Compensator_P = {
     /*  Expression: pInitialization.L
      * Referenced by: '<S16>/KalmanGainL'
      */
-    { 0.026590304322228548, 0.069776736071495274 },
+    { 0.026590304322228892, 0.0697767360714959 },
 
     /*  Expression: pInitialization.A
      * Referenced by: '<S68>/A'
@@ -456,7 +456,7 @@ static P_Drone_Compensator_T Drone_Compensator_P = {
     /*  Expression: pInitialization.L
      * Referenced by: '<S74>/KalmanGainL'
      */
-    { 0.1254656089860898, 0.0, 0.0, 0.1254656089860898 },
+    { 0.12546560898608936, 0.0, 0.0, 0.12546560898608936 },
 
     /*  Expression: pInitialization.A
      * Referenced by: '<S131>/A'
@@ -471,7 +471,7 @@ static P_Drone_Compensator_T Drone_Compensator_P = {
     /*  Expression: pInitialization.L
      * Referenced by: '<S134>/KalmanGainL'
      */
-    { 0.005756860081440762, 0.0, 0.0, 0.005756860081440762 },
+    { 0.0057568600814408791, 0.0, 0.0, 0.0057568600814408791 },
     1U,                                /* Computed Parameter: Delay_DelayLength
                                         * Referenced by: '<S66>/Delay'
                                         */
@@ -942,6 +942,7 @@ void RSEDU_control(HAL_acquisition_t* hal_sensors_data, HAL_command_t* hal_senso
                     else if(!strcmp(tmpstr1, "POWERGAIN"))
                     {
                         powerGain_paramsFile = atoi(tmpstr2) / 100.0;
+                        printf("powergain params (%f) \n\n\n",powerGain_paramsFile);
                     }
                     else if(!strcmp(tmpstr1, "FEAT_POSVIS_USE"))
                     {
@@ -1138,7 +1139,7 @@ void RSEDU_control(HAL_acquisition_t* hal_sensors_data, HAL_command_t* hal_senso
         printf("Sensorcal: %f :: %f :: %f :: %f :: %f :: %f :: %f \n", sensorCal[0], sensorCal[1], sensorCal[2], sensorCal[3], sensorCal[4], sensorCal[5], sensorCal[6]);
 
         //Stop if angled take-off
-        if((!FEAT_NOSAFETY) && fabs(9.81 + sensorCal[2]) > 0.7)
+        if((!FEAT_NOSAFETY) && fabs(9.81 + sensorCal[2]) > 2.0)
         {
             run_flag = 0;
             printf("ERROR: Please take off from a level surface! \n");
@@ -1254,6 +1255,10 @@ void RSEDU_control(HAL_acquisition_t* hal_sensors_data, HAL_command_t* hal_senso
         if(counter < calibCycles + takeoffCycles)
         {
             powerGain = powerGain_paramsFile;
+            //printf("Counter : (%d) \n", counter);
+            //printf("calibCycles : (%d) \n", calibCycles);
+            //printf("takeoffCycles : (%d) \n", takeoffCycles);
+            //printf("PowerGain : (%f) \n\n\n", powerGain);
 	    Drone_Compensator_U_takeoff_flag = 1;  //enables take-off procedure, disables altitude-control
             Drone_Compensator_U_pos_refin[2] = -1.1;
 	    
@@ -1282,6 +1287,8 @@ void RSEDU_control(HAL_acquisition_t* hal_sensors_data, HAL_command_t* hal_senso
         else if(counter < onCycles)
         {
             powerGain = powerGain_paramsFile;
+
+            //printf("Actual Flight PowerGain : (%f) \n\n\n", powerGain);
 
             //Read from reference value server
             fcntl(sockfd, F_SETFL, O_NONBLOCK);
