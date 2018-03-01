@@ -9,9 +9,11 @@
 % ===============================
 %  2015/08/25 created
 % ==================================
+clear
+close all
+clc
+load turntable
 
-
-load('C:\Users\Tony\Documents\GitHub\drone\MIT_MatlabToolbox\DroneExchange\RollPitchYaw.mat')
 
 %% Rearrange data
 %Load all parameters
@@ -108,38 +110,45 @@ end;
 %% accelerometer, gyro, orientation, motor commands
 visUpdatesAvlble = (RSrun_posVIS(:,2)~=-99);
 
-figure('Name','Sensors, Orientation & Motors','Position',[100 100 600 700]);
+%figure('Name','Sensors, Orientation & Motors','Position',[100 100 600 700]);
 
 %accelerometer
-h(1)=subplot(4,1,1);
+%h(1)=subplot(4,1,1);
+figure
+
 plot(RSrun_sensordata(:,1),RSrun_sensordata(:,2:4))
+title('Acceleration')
 ylabel({'IMUaccel $[m/s^2]$'},'Interpreter','latex');
-legend({'$\tilde{a}_x$' '$\tilde{a}_y$' '$\tilde{a}_z$'},'Interpreter','latex');
-ylim([-12 12])
+legend({'$\tilde{a}_x$' '$\tilde{a}_y$' '$\tilde{a}_z$'},'Interpreter','latex','Location','best');
+%ylim([-12 12])
 
 
 %gyro
-h(2)=subplot(4,1,2);
+%h(2)=subplot(4,1,2);
+figure
 plot(RSrun_sensordata(:,1),RSrun_sensordata(:,5:end-2))
+title('Gyro')
 ylabel({'IMUgyro $[rad/s]$'},'Interpreter','latex');
-legend({ '$w_x$' '$w_y$' '$w_z$'},'Interpreter','latex');
-ylim([-1 1])
+legend({ '$w_x$' '$w_y$' '$w_z$'},'Interpreter','latex','Location','best');
+%ylim([-1 1])
 
 %state estimates
-h(3)=subplot(4,1,3);
+%h(3)=subplot(4,1,3);
+figure
 plot(RSrun_states_estim(:,1),RSrun_states_estim(:,5:7),'.-'); hold all;
 plot(RSrun_orient_ref(:,1),RSrun_orient_ref(:,2:end));
 if (any(visUpdatesAvlble))
     plot(RSrun_posVIS(visUpdatesAvlble,1),RSrun_posVIS(visUpdatesAvlble,5),'o');
-    legend({'yaw $\hat{\psi}$' 'pitch $\hat{\theta}$' 'roll $\hat{\phi}$' '$\psi_{d}$' '$\theta_{d}$' '$\phi_{d}$' '$\hat{\psi}_{VIS}$'  },'Interpreter','latex');
+    legend({'yaw $\hat{\psi}$' 'pitch $\hat{\theta}$' 'roll $\hat{\phi}$' '$\psi_{d}$' '$\theta_{d}$' '$\phi_{d}$' '$\hat{\psi}_{VIS}$'  },'Interpreter','latex','Location','best');
 else
-    legend({'yaw' 'pitch' 'roll' 'yaw_{ref}' 'pitch_{ref}' 'roll_{ref}'});
+    legend({'yaw' 'pitch' 'roll' 'yaw_{ref}' 'pitch_{ref}' 'roll_{ref}'},'Location','best');
 end;
-
+title('Euler Angles')
 ylabel({'orientation $[rad]$'},'Interpreter','latex');
 
-ylim([-0.3 0.3])
+%ylim([-0.3 0.3])
 
+%{
 %motorcommands
 h(4)=subplot(4,1,4);
 plot(RSrun_motorcommands(:,1),RSrun_motorcommands(:,2:end));
@@ -150,8 +159,7 @@ ylim([-600 600])
 
 set(h(1:end-1),'xticklabel',[])
 linkaxes(h,'x');
-
-
+%}
 %% Altitude
 
 figure('Name','Altitude');
@@ -174,7 +182,7 @@ plot(RSrun_pos_ref(:,1),RSrun_pos_ref(:,4),'g','LineWidth',2);
 visUpdatesAvlble = (RSrun_posVIS(:,2)~=-99);
 plot(RSrun_posVIS(visUpdatesAvlble,1),-RSrun_posVIS(visUpdatesAvlble,4),'o','LineWidth',3);
 
-legend({'Pressure $\hat{z}_{prs}$'  'Sonar $\hat{z}_{snr}$' 'Kalman-estimate $\hat z$' 'Reference $z_{d}$' 'Vision $\hat{z}_{VIS}$' },'Interpreter','latex');
+legend({'Pressure $\hat{z}_{prs}$'  'Sonar $\hat{z}_{snr}$' 'Kalman-estimate $\hat z$' 'Reference $z_{d}$' 'Vision $\hat{z}_{VIS}$' },'Interpreter','latex','Location','best');
 ylim([-3.5 1]);
 xlabel({'t[s]'},'Interpreter','latex');
 ylabel({'altitude [m]'},'Interpreter','latex');
@@ -240,10 +248,10 @@ plot(RSrun_opticalFlow(:,1),1/quadEDT.velocityToOpticalFlow_gain*RSrun_opticalFl
 plot(RSrun_states_estim(:,1),RSrun_states_estim(:,8),'.-');
 plot(RSrun_states_estim(:,1),RSrun_states_estim(:,9),'.-');
 
-legend({'$\dot{x}_{opt. flow}$' '$\dot{y}_{opt. flow}$' '$\dot x$' '$\dot y$'},'Interpreter', 'latex');
+legend({'$\dot{x}_{opt. flow}$' '$\dot{y}_{opt. flow}$' '$\dot x$' '$\dot y$'},'Interpreter', 'latex','Location','best');
 xlabel({'t [s]'},'Interpreter','latex');
 ylabel({'[m/s]'},'Interpreter','latex');
-
+%{
 %% Battery status
 if exist('RSrun_batteryStatus','var')
     
@@ -254,3 +262,4 @@ if exist('RSrun_batteryStatus','var')
     xlabel({'t [s]'},'Interpreter','latex');
     ylabel({'\%'},'Interpreter','latex');
 end;
+%}
