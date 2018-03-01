@@ -1,7 +1,7 @@
 clc
 clear
 close all
-load simulation_slow_1
+load simulation_fast_1
 
 motor_commands = rt_yout_sim.signals(1).values;
 X = rt_yout_sim.signals(2).values;
