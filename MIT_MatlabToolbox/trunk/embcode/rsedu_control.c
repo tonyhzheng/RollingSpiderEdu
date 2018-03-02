@@ -31,7 +31,7 @@ int onCycles 		= 8000; //note that code runs at 200Hz! So 4000-> 20sec
 int calibCycles 	= 400;
 int takeoffCycles	= 200;
 
-double moveInterval = 3;
+double moveInterval = 5;
 double pauseInterval = 1;
 double tempTime = 0.0;
 double counterDbl = 0.0;
@@ -39,7 +39,7 @@ double xHold = 0.0;
 double yHold = 0.0;
 double xRef = 0.0;
 double yRef = 0.0;
-double positionMultiplier = 0.5;
+double positionMultiplier = .8;
 //-------------------
 //SIMULINK compensator block "Parameter definitions"
 //-------------------
