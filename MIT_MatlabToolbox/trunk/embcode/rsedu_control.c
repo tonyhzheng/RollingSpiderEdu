@@ -32,14 +32,14 @@ int calibCycles 	= 400;
 int takeoffCycles	= 200;
 
 double moveInterval = 3;
-double pauseInterval = 3;
+double pauseInterval = 1;
 double tempTime = 0.0;
 double counterDbl = 0.0;
 double xHold = 0.0;
 double yHold = 0.0;
 double xRef = 0.0;
 double yRef = 0.0;
-double positionMultiplier = 0.7;
+double positionMultiplier = 0.5;
 //-------------------
 //SIMULINK compensator block "Parameter definitions"
 //-------------------
