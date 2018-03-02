@@ -39,7 +39,7 @@ double xHold = 0.0;
 double yHold = 0.0;
 double xRef = 0.0;
 double yRef = 0.0;
-double positionMultiplier = 0.5;
+double positionMultiplier = 0.7;
 //-------------------
 //SIMULINK compensator block "Parameter definitions"
 //-------------------
