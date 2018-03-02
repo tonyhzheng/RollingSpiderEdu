@@ -1328,9 +1328,9 @@ void RSEDU_control(HAL_acquisition_t* hal_sensors_data, HAL_command_t* hal_senso
             counterDbl = counter;
             if (counterDbl > 1500){
               tempTime = fmod(counterDbl-1500,(moveInterval*4+pauseInterval*4)*200)*.005;
-              printf("Time = %f\n",tempTime);
-              printf("x = %f\n",xRef);
-              printf("y = %f\n",yRef);
+              //printf("Time = %f\n",tempTime);
+              //printf("x = %f\n",xRef);
+              //printf("y = %f\n",yRef);
             if((tempTime>0)&&(tempTime<moveInterval)){
               printf("Move Right\n");
               xHold = 0;
