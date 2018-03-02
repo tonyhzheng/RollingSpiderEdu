@@ -31,12 +31,15 @@ int onCycles 		= 8000; //note that code runs at 200Hz! So 4000-> 20sec
 int calibCycles 	= 400;
 int takeoffCycles	= 200;
 
-double moveInterval = 2;
-double pauseInterval = 2;
+double moveInterval = 3;
+double pauseInterval = 3;
 double tempTime = 0.0;
 double counterDbl = 0.0;
 double xHold = 0.0;
 double yHold = 0.0;
+double xRef = 0.0;
+double yRef = 0.0;
+double positionMultiplier = 0.5;
 //-------------------
 //SIMULINK compensator block "Parameter definitions"
 //-------------------
@@ -822,7 +825,7 @@ void RSEDU_control(HAL_acquisition_t* hal_sensors_data, HAL_command_t* hal_senso
     static float MAX_RANGE 		= 10.0;
     static float MIN_BATTTAKEOFF 	= 50.0;
     static float MIN_BATT		= 30.0;
-    static int MAX_noOF 		= 50; //maximum acceptable numbers of cycles without optical flow
+    static int MAX_noOF 		= 100; //maximum acceptable numbers of cycles without optical flow
 
     //powe/usr input    
     double powerGain = 0;
@@ -1326,55 +1329,72 @@ void RSEDU_control(HAL_acquisition_t* hal_sensors_data, HAL_command_t* hal_senso
             if (counterDbl > 1500){
               tempTime = fmod(counterDbl-1500,(moveInterval*4+pauseInterval*4)*200)*.005;
               printf("Time = %f\n",tempTime);
-              printf("x = %f\n",xHold);
-              printf("y = %f\n",yHold);
+              printf("x = %f\n",xRef);
+              printf("y = %f\n",yRef);
             if((tempTime>0)&&(tempTime<moveInterval)){
               printf("Move Right\n");
               xHold = 0;
-              yHold = tempTime/moveInterval/2;
+              yHold = tempTime/moveInterval*positionMultiplier;
+              xRef = 0;
+              yRef = tempTime/moveInterval*positionMultiplier;
+
               Drone_Compensator_U_pos_refin[0] = 0;
-              Drone_Compensator_U_pos_refin[1] = tempTime/moveInterval/2; 
+              Drone_Compensator_U_pos_refin[1] = tempTime/moveInterval*positionMultiplier; 
 
             }
             else if((tempTime>=moveInterval)&&(tempTime<moveInterval+pauseInterval)){
               printf("Hold 1\n");
+              xRef = xHold;
+              yRef = yHold;
               Drone_Compensator_U_pos_refin[0] = xHold;
               Drone_Compensator_U_pos_refin[1] = yHold; 
             }
             else if((tempTime>=moveInterval+pauseInterval)&&(tempTime<moveInterval*2+pauseInterval)){
               printf("Move Forward\n");
-              xHold = (tempTime-moveInterval-pauseInterval)/moveInterval/2;
-              Drone_Compensator_U_pos_refin[0] = (tempTime-moveInterval-pauseInterval)/moveInterval/2;
+              xHold = (tempTime-moveInterval-pauseInterval)/moveInterval*positionMultiplier;
+              xRef = xHold;
+              yRef = yHold;
+              Drone_Compensator_U_pos_refin[0] = (tempTime-moveInterval-pauseInterval)/moveInterval*positionMultiplier;
               Drone_Compensator_U_pos_refin[1] = yHold; 
               /*Drone_Compensator_U_pos_refin[0] = 0;
               Drone_Compensator_U_pos_refin[1] = -(tempTime-moveInterval+1)/moveInterval/2; */
             }
             else if((tempTime>=moveInterval*2+pauseInterval)&&(tempTime<moveInterval*2+2*pauseInterval)){
               printf("Hold 2\n");
+              xRef = xHold;
+              yRef = yHold;
               Drone_Compensator_U_pos_refin[0] = xHold;
               Drone_Compensator_U_pos_refin[1] = yHold;
             }
             else if((tempTime>=moveInterval*2+2*pauseInterval)&&(tempTime<moveInterval*3+2*pauseInterval)){
               printf("Move Left\n");
+              xRef = xHold;
+              yRef = yHold-(tempTime-moveInterval*2-2*pauseInterval)/moveInterval*positionMultiplier;
               Drone_Compensator_U_pos_refin[0] = xHold;
-              Drone_Compensator_U_pos_refin[1] = yHold-(tempTime-moveInterval*2-2*pauseInterval)/moveInterval/2;
+              Drone_Compensator_U_pos_refin[1] = yHold-(tempTime-moveInterval*2-2*pauseInterval)/moveInterval*positionMultiplier;
               /*Drone_Compensator_U_pos_refin[0] = 0;
               Drone_Compensator_U_pos_refin[1] = (tempTime-moveInterval*2+2)/moveInterval/2;*/
             }
             else if((tempTime>=moveInterval*3+2*pauseInterval)&&(tempTime<moveInterval*3+3*pauseInterval)){
               printf("Hold 3\n");
+              xRef = xHold;
+              yRef = yHold;
               Drone_Compensator_U_pos_refin[0] = xHold;
               Drone_Compensator_U_pos_refin[1] = 0;
             }
             else if((tempTime>=moveInterval*3+3*pauseInterval)&&(tempTime<moveInterval*4+3*pauseInterval)){
               printf("Move Back\n");
-              Drone_Compensator_U_pos_refin[0] = xHold-(tempTime-moveInterval*3+3*pauseInterval)/moveInterval/2;
+              xRef = xHold-(tempTime-moveInterval*3+3*pauseInterval)/moveInterval*positionMultiplier;
+              yRef = 0;
+              Drone_Compensator_U_pos_refin[0] = xHold-(tempTime-moveInterval*3-3*pauseInterval)/moveInterval*positionMultiplier;
               Drone_Compensator_U_pos_refin[1] = 0; 
               /*Drone_Compensator_U_pos_refin[0] = 0;
               Drone_Compensator_U_pos_refin[1] = -(tempTime-moveInterval*3+3)/moveInterval/2; */
             }
             else{
               printf("Hold 4\n");
+              xRef = xHold;
+              yRef = yHold;
               Drone_Compensator_U_pos_refin[0] = 0;
               Drone_Compensator_U_pos_refin[1] = 0;
             }
