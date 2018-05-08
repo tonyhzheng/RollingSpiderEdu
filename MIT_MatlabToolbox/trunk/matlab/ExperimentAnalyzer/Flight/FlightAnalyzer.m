@@ -11,7 +11,7 @@
 % ==================================
 
 
-load('C:\Users\Tony\Documents\GitHub\drone\MIT_MatlabToolbox\DroneExchange\RollPitchYaw.mat')
+load('C:\Users\Tony\Documents\GitHub\drone\MIT_MatlabToolbox\DroneExchange\updownfastslow.mat')
 
 %% Rearrange data
 %Load all parameters

@@ -12,7 +12,7 @@
 clear
 close all
 clc
-load turntable
+load upstayat2m
 
 
 %% Rearrange data
@@ -148,18 +148,7 @@ ylabel({'orientation $[rad]$'},'Interpreter','latex');
 
 %ylim([-0.3 0.3])
 
-%{
-%motorcommands
-h(4)=subplot(4,1,4);
-plot(RSrun_motorcommands(:,1),RSrun_motorcommands(:,2:end));
-ylabel({'motor commands'},'Interpreter','latex');
-xlabel({'t [s]'},'Interpreter','latex');
-legend({'m$_1$' 'm$_2$' 'm$_3$' 'm$_4$'},'Interpreter','latex');
-ylim([-600 600])
 
-set(h(1:end-1),'xticklabel',[])
-linkaxes(h,'x');
-%}
 %% Altitude
 
 figure('Name','Altitude');
@@ -186,12 +175,23 @@ legend({'Pressure $\hat{z}_{prs}$'  'Sonar $\hat{z}_{snr}$' 'Kalman-estimate $\h
 ylim([-3.5 1]);
 xlabel({'t[s]'},'Interpreter','latex');
 ylabel({'altitude [m]'},'Interpreter','latex');
+title('Altitude')
+
+
+%% motorcommands
+figure
+plot(RSrun_motorcommands(:,1),RSrun_motorcommands(:,2:end));
+ylabel({'motor commands'},'Interpreter','latex');
+xlabel({'t [s]'},'Interpreter','latex');
+legend({'m$_1$' 'm$_2$' 'm$_3$' 'm$_4$'},'Interpreter','latex');
+title('Motor Commands vs. Time')
+ylim([-600 600])
 
 %% 2D Position & Velocity
 visUpdatesAvlble = (RSrun_posVIS(:,2)~=-99);
     
-figure('Name','Positions & Velocities','Position',[100 100 600 700]);
-subplot(6,1,1:2);
+figure%('Name','Positions & Velocities','Position',[100 100 600 700]);
+%subplot(6,1,1:2);
 
 %Trajectory
 plot(RSrun_states_estim(:,3),RSrun_states_estim(:,2));
@@ -199,15 +199,17 @@ hold all;
 plot(RSrun_states_estim(1,3),RSrun_states_estim(1,2),'rx');
 plot(RSrun_states_estim(end,3),RSrun_states_estim(end,2),'gx');
 plot(RSrun_posVIS(visUpdatesAvlble,3),RSrun_posVIS(visUpdatesAvlble,2),'o-');
-set(gca,'xaxisLocation','top')
-legend({'$\hat{Pos}$','start','finish','$\hat{Pos}_{VIS}$'},'Interpreter', 'latex')
-ylim([-.3 .3]);
-xlabel({'$Y$ [m]'},'Interpreter','latex');
-ylabel({'$X$ [m]'},'Interpreter','latex');
-axis equal
+%set(gca,'xaxisLocation','top')
+%set(gca,'Xdir','reverse')
+legend({'$\hat{Pos}$','start','finish','$\hat{Pos}_{VIS}$'},'Location','best','Interpreter', 'latex')
+%ylim([-.3 .3]);
+title('Drone Trajectory')
+xlabel({'$X$ [m]'},'Interpreter','latex');
+ylabel({'$Y$ [m]'},'Interpreter','latex');
+%axis equal
 
 %Positions
-h(1)=subplot(12,1,5:6);
+figure
 axis normal
 plot(RSrun_states_estim(:,1),RSrun_states_estim(:,2));hold all;
 plot(RSrun_posVIS(visUpdatesAvlble,1),RSrun_posVIS(visUpdatesAvlble,2),'o'); 
@@ -215,7 +217,7 @@ legend({'$\hat{X}$','$\hat{X}_{VIS}$'},'Interpreter','latex')
 ylim([-.7 .7])
 ylabel({'$X$ [m]'},'Interpreter','latex');
 
-h(2)=subplot(12,1,7:8);
+figure
 plot(RSrun_states_estim(:,1),RSrun_states_estim(:,3));   hold all;
 plot(RSrun_posVIS(visUpdatesAvlble,1),RSrun_posVIS(visUpdatesAvlble,3),'o');
 legend({'$\hat{Y}$','$\hat{Y}_{VIS}$'},'Interpreter','latex')
@@ -229,14 +231,14 @@ plot(RSrun_states_estim(:,1),RSrun_states_estim(:,8));
 ylabel('$\dot x$ [m/s]','Interpreter','latex');
 legend({'$\dot{x}_{opt. flow}$' '$\hat{\dot x}$'},'Interpreter','latex');
 
-h(4)=subplot(12,1,11:12);
+figure
 plot(RSrun_opticalFlow(:,1),20*RSrun_opticalFlow(:,3),'.-'); hold all;
 plot(RSrun_states_estim(:,1),RSrun_states_estim(:,9));
 xlabel({'t [s]'},'Interpreter','latex');
 ylabel('$\dot y$ [m/s]','Interpreter','latex');
 legend({'$\dot{y}_{opt. flow}$' '$\hat{\dot y}$'},'Interpreter','latex');
 
-set(h(1:end-1),'xticklabel',[])
+%set(h(1:end-1),'xticklabel',[])
 linkaxes(h,'x');
 
 %% Velocity, Optical Flow
