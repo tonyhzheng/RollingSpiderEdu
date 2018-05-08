@@ -101,3 +101,10 @@ controlHelperParams.motorsThrustperMotor_max    = quadEDT.motors_max*quadEDT.mot
 %Poleplace: see separate files for parameters
 %LQR: see separate files for parameters
 
+% These values are input arguments to the Matlab function
+dT = quadEDT.sampletime;
+sigmaW = blkdiag(0.0005, 0.1);
+
+% These values are used to initialize the state and covariance delays
+x0 = [-0.05 0];
+sigmaX0 = zeros(2,2);
